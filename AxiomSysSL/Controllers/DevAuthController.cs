@@ -19,8 +19,10 @@ namespace AxiomSysSL.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult Get(int userId = 1, int company = 1)
+		public IActionResult Get(int? userId, int? company )
 		{
+			int user = userId ?? 1;
+			int comp = company ?? 1;
 			string secret = _config["Jwt:Key"]!;
 			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
 			var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
