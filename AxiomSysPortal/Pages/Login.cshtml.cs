@@ -46,23 +46,18 @@ namespace AxiomSysPortal.Pages
 
 		public async Task<IActionResult> OnPost()
 		{
-			string baseUrl = "https://localhost:7075";
-			string url = $"{baseUrl}/api/DevAuth?userId=1&company=1";
-
-			var client = _httpClientFactory.CreateClient();
-
+			string url = _configuration.GetValue<string>("Uri") + "DevAuth?userId=1&company=1";
+			HttpClient client = _httpClientFactory.CreateClient();
 			string token = await client.GetStringAsync(url);
 
-			List<Claim> claims = new List<Claim>
-					{
-						new Claim("token", token.Trim('"'))
-					};
-
+			// 2. Keep the token in the user's cookie as a claim called "token"
+			List<Claim> claims = new List<Claim>();
+			claims.Add(new Claim("token", token.Trim('"')));
 			ClaimsIdentity identity = new ClaimsIdentity(claims, "Cookies");
 			ClaimsPrincipal principal = new ClaimsPrincipal(identity);
-
 			await HttpContext.SignInAsync("Cookies", principal);
 
+			// 3. Go to the delivery terms page
 			return Redirect("/en/SALES/DELIVERYTERMS/Index");
 		}
 

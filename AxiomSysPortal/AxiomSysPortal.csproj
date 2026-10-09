@@ -10,4 +10,12 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AxiomSysBL\AxiomSysBL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\PagesJS\SALES\DELIVERYTERMS.js" />
+  </ItemGroup>
+
 </Project>

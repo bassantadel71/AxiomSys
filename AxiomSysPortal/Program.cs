@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;
+using System.Globalization;
 
 namespace AxiomSysPortal
 {
@@ -8,11 +11,18 @@ namespace AxiomSysPortal
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
+			void ConfigureCookie(CookieAuthenticationOptions options)
+			{
+				options.LoginPath = "/Login";
+			}
+
 			// Add services to the container.
 			builder.Services.AddRazorPages();
 
-			builder.Services.AddHttpContextAccessor();
 			builder.Services.AddHttpClient();
+			builder.Services.AddHttpContextAccessor();
+
+			builder.Services.AddSingleton<SharedLocalizer>();
 
 			// Cookie login: users who are not logged in go to /Login
 			builder.Services.AddAuthentication("Cookies").AddCookie("Cookies", ConfigureCookie);
@@ -23,43 +33,36 @@ namespace AxiomSysPortal
 
 			var app = builder.Build();
 
-			// Configure the HTTP request pipeline.
-			if (!app.Environment.IsDevelopment())
-			{
-				app.UseExceptionHandler("/Error");
-				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-				app.UseHsts();
-			}
+			
 
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
 			app.UseRouting();
 
 
-			// Culture comes from the address: /en/... or /ar/...
+			CultureInfo english = new CultureInfo("en");
+			CultureInfo arabic = new CultureInfo("ar");
+			arabic.NumberFormat.NativeDigits = new string[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+			arabic.NumberFormat.DigitSubstitution = DigitShapes.None;
+
 			RequestLocalizationOptions localization = new RequestLocalizationOptions();
-			localization.SetDefaultCulture("en");
-			localization.AddSupportedCultures("en", "ar");
-			localization.AddSupportedUICultures("en", "ar");
+			localization.DefaultRequestCulture = new RequestCulture(english);
+			localization.SupportedCultures = new List<CultureInfo> { english, arabic };
+			localization.SupportedUICultures = new List<CultureInfo> { english, arabic };
+
+			// The culture comes from the address: /en/... or /ar/...
 			RouteDataRequestCultureProvider provider = new RouteDataRequestCultureProvider();
 			provider.Options = localization;
 			localization.RequestCultureProviders.Insert(0, provider);
 			app.UseRequestLocalization(localization);
 
-
-
 			app.UseAuthentication();
 			app.UseAuthorization();
 
-			//app.MapStaticAssets();
 			app.MapRazorPages();
-
 			app.Run();
 
-			void ConfigureCookie(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions options)
-			{
-				options.LoginPath = "/Login";
-			}
+			
 		}
 	}
 }
