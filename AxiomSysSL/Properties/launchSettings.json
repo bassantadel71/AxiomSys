@@ -19,5 +19,8 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
-  }
+  },
+  "Uri": "https://localhost:7001/api/",
+  "Logging": { "LogLevel": { "Default": "Information" } },
+  "AllowedHosts": "*"
 }

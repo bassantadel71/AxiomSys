@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Database/">
+    <File Path="SA_DELIVERY_TERMS.sql" />
+  </Folder>
   <Project Path="AxiomSysBL/AxiomSysBL.csproj" />
   <Project Path="AxiomSysDL/AxiomSysDL.csproj" />
   <Project Path="AxiomSysPortal/AxiomSysPortal.csproj" />
