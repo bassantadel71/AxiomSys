@@ -1,0 +1,161 @@
+﻿@page "/{culture}/SALES/DELIVERYTERMS/Index"
+@model AxiomSysPortal.Pages.SALES.DELIVERYTERMS.IndexModel
+@using System.Globalization
+@inject AxiomSysPortal.SharedLocalizer SharedLocalizer
+@{
+	ViewData["Title"] = SharedLocalizer["9005"];
+}
+
+<div id="flash"
+	 data-success="@TempData["SuccessMessage"]"
+	 data-error="@TempData["ErrorMessage"]"></div>
+
+<div id="pageTexts" class="d-none"
+	 data-search="@SharedLocalizer["9006"]"
+	 data-confirm-title="@SharedLocalizer["9007"]"
+	 data-confirm-text="@SharedLocalizer["9008"]"
+	 data-confirm-yes="@SharedLocalizer["9010"]"
+	 data-cancel="@SharedLocalizer["9004"]"
+	 data-ar-only="@SharedLocalizer["9013"]"
+	 data-en-only="@SharedLocalizer["9014"]"
+	 data-load-error="@SharedLocalizer["9015"]"
+	 data-length-menu="@SharedLocalizer["9016"]"
+	 @* data-info="@SharedLocalizer["9017"]" *@
+	 data-info-empty="@SharedLocalizer["9018"]"
+	 data-zero-records="@SharedLocalizer["9019"]"
+	 data-next="@SharedLocalizer["9020"]"
+	 data-previous="@SharedLocalizer["9021"]"
+	 data-info-filtered="@SharedLocalizer["9022"]"></div>
+
+<!-- Toolbar -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<h4 class="m-0">@SharedLocalizer["9005"]</h4>
+	<div class="d-flex gap-2 align-items-center">
+		<div id="tableSearch" class="search-input"></div>
+		<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+			@SharedLocalizer["32"]
+		</button>
+	</div>
+</div>
+
+<!-- Table -->
+<table id="dataTable" class="table table-striped w-100">
+	<thead>
+		<tr>
+			<th>@SharedLocalizer["3"]</th>
+			<th>@SharedLocalizer["5"]</th>
+			<th>@SharedLocalizer["4"]</th>
+			<th>@SharedLocalizer["9001"]</th>
+			<th>@SharedLocalizer["9002"]</th>
+			<th>@SharedLocalizer["9009"]</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var term in Model.Terms)
+		{
+			<tr>
+				<td>@term.Code.ToString(CultureInfo.InvariantCulture)</td>
+				<td>@term.SName</td>
+				<td>@term.BName</td>
+				<td>@(term.Days.HasValue ? term.Days.Value.ToString(CultureInfo.InvariantCulture) : "")</td>
+				<td>@(term.ActiveFlag == 1 ? SharedLocalizer["9011"] : SharedLocalizer["9012"])</td>
+				<td>
+					<button type="button" class="btn btn-sm btn-outline-primary edit-btn" data-code="@term.Code">@SharedLocalizer["5583"]</button>
+					<button type="button" class="btn btn-sm btn-outline-danger delete-btn" data-code="@term.Code">@SharedLocalizer["18"]</button>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
+
+<!-- Add modal -->
+<div class="modal fade" id="addModal" tabindex="-1">
+	<div class="modal-dialog">
+		<form method="post" class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">@SharedLocalizer["32"]</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<label class="form-label">@SharedLocalizer["3"]</label>
+					<input type="number" name="Term.Code" class="form-control" min="1" max="999" required />
+				</div>
+				<div class="mb-3">
+					<label class="form-label">@SharedLocalizer["5"]</label>
+					<input type="text" name="Term.SName" class="form-control" maxlength="60" required />
+				</div>
+				<div class="mb-3">
+					<label class="form-label">@SharedLocalizer["4"]</label>
+					<input type="text" name="Term.BName" class="form-control" maxlength="60" required />
+				</div>
+				<div class="mb-3">
+					<label class="form-label">@SharedLocalizer["9001"]</label>
+					<input type="number" name="Term.Days" class="form-control" min="0" max="9999" />
+				</div>
+				<div class="mb-3">
+					<label class="form-label">@SharedLocalizer["9002"]</label>
+					<select name="Term.ActiveFlag" class="form-select">
+						<option value="1">@SharedLocalizer["9011"]</option>
+						<option value="0">@SharedLocalizer["9012"]</option>
+					</select>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@SharedLocalizer["9004"]</button>
+				<button type="submit" name="AddDetail" value="1" class="btn btn-primary">@SharedLocalizer["9003"]</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<!-- Edit modal (filled by JS) -->
+<div class="modal fade" id="editModal" tabindex="-1">
+	<div class="modal-dialog">
+		<form method="post" class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">@SharedLocalizer["5583"]</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<label class="form-label">@SharedLocalizer["3"]</label>
+					<input type="number" id="editCode" name="Term.Code" class="form-control" readonly />
+				</div>
+				<div class="mb-3">
+					<label class="form-label">@SharedLocalizer["5"]</label>
+					<input type="text" id="editSName" name="Term.SName" class="form-control ar-name" maxlength="60" required />
+				</div>
+				<div class="mb-3">
+					<label class="form-label">@SharedLocalizer["4"]</label>
+					<input type="text" id="editBName" name="Term.BName" class="form-control en-name" maxlength="60" required />
+				</div>
+				<div class="mb-3">
+					<label class="form-label">@SharedLocalizer["9001"]</label>
+					<input type="number" id="editDays" name="Term.Days" class="form-control" min="0" max="9999" />
+				</div>
+				<div class="mb-3">
+					<label class="form-label">@SharedLocalizer["9002"]</label>
+					<select id="editActive" name="Term.ActiveFlag" class="form-select">
+						<option value="1">@SharedLocalizer["9011"]</option>
+						<option value="0">@SharedLocalizer["9012"]</option>
+					</select>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@SharedLocalizer["9004"]</button>
+				<button type="submit" name="EditDetail" value="1" class="btn btn-primary">@SharedLocalizer["9003"]</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<!-- Hidden delete form (submitted after the SweetAlert confirm) -->
+<form method="post" id="deleteForm">
+	<input type="hidden" name="Term.Code" id="deleteCode" />
+	<input type="hidden" name="DeleteDetail" value="1" />
+</form>
+
+@section Scripts {
+	<script src="~/PagesJS/SALES/DELIVERYTERMS.js" asp-append-version="true"></script>
+}
